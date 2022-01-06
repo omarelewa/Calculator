@@ -14,12 +14,28 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     String display = "";
+
+    private static final int EQUALS = 0;
+    private static final int ADD = 1;
+    private static final int SUBTRACT = 2;
+    private static final int MULTIPLY = 3;
+    private static final int DIVIDE = 4;
+    private static final int SWITCH_SIGN = 5;
+    private static final int PERCENT = 6;
+
+    private static final int RESULT = 0;
+    private static final int OPERAND_1 = 1;
+
+    private static final int AC = 0;
+    private static final int C = 1;
+
     int operand_1 = 0;
     // 1 = add; 2 = subtract; 3 = multiply; 4 divide; 5 switch_sign; 6 percent; 0 = equals;
-    int operation = 0;
+    int operation = EQUALS;
+
     int result = 0;
-    int mode = 0;
-    int clear_level = 0;
+    int mode = RESULT;
+    int clear_level = AC;
 
     // 0 = Error; 1 = Operand 1; 2 = Operand 2; 3 = Result;
     int view = 1;
