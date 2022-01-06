@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RESULT = 0;
     private static final int OPERAND_1 = 1;
-    private static final int RESULT_D = 10;
-    private static final int OPERAND_D = 11;
+    private static final int RESULT_D = 0;
+    private static final int OPERAND_D = 1;
 
     private static final int AC = 0;
     private static final int C = 1;
@@ -47,28 +47,54 @@ public class MainActivity extends AppCompatActivity {
     int view = 1;
 
     private void evaluate(int next) {
-        switch (operation) {
-            case 1:
-                result = operand_1 + result;
-                break;
-            case 2:
-                result = result - operand_1;
-                break;
-            case 3:
-                result = operand_1 * result;
-                break;
-            case 4:
-                result_d = result_d / operand_d;
-                break;
-            case 5:
-                result = result * -1;
-                break;
-            case 6:
-                result = result / 100;
-                break;
-            case 0:
-            default:
-                break;
+        if (precision == WHOLE_NUMBERS) {
+            switch (operation) {
+                case 1:
+                    result = operand_1 + result;
+                    break;
+                case 2:
+                    result = result - operand_1;
+                    break;
+                case 3:
+                    result = operand_1 * result;
+                    break;
+                case 4:
+                    result_d = result_d / operand_d;
+                    break;
+                case 5:
+                    result = result * -1;
+                    break;
+                case 6:
+                    result = result / 100;
+                    break;
+                case 0:
+                default:
+                    break;
+            }
+        } else {
+            switch (operation) {
+                case 1:
+                    result_d = operand_d + result_d;
+                    break;
+                case 2:
+                    result_d = result_d - operand_d;
+                    break;
+                case 3:
+                    result_d = operand_d * result_d;
+                    break;
+                case 4:
+                    result_d = result_d / operand_d;
+                    break;
+                case 5:
+                    result_d = result_d * -1;
+                    break;
+                case 6:
+                    result_d = result_d / 100;
+                    break;
+                case 0:
+                default:
+                    break;
+            }
         }
         operation = next;
     }
@@ -158,15 +184,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(EQUALS);
+//                evaluate(EQUALS);
 //                display = display + btn.getText().toString();
 //                screen.setText(display);
 //                System.out.println(btn.getText().toString());
-                if (display.length() > 0) {
-                    result = Integer.parseInt(display) * -1;
+                if (precision == WHOLE_NUMBERS) {
+                    if (display.length() > 0) {
+                        result = Integer.parseInt(display) * -1;
+                    }
+                    display = String.valueOf(result);
+                    screen.setText(display);
+                } else {
+                    if (display.length() > 0) {
+                        result_d = Double.parseDouble(display) * -1;
+                    }
+                    display = String.valueOf(result_d);
+                    screen.setText(display);
                 }
-                display = String.valueOf(result);
-                screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
                 System.out.println("Result Decimal: " + result_d);
@@ -207,7 +241,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 evaluate(DIVIDE);
-                mode = 1;
+                precision = FRACTIONAL_NUMBERS;
+                result_d = result;
+                operand_d = operand_1;
+                mode = OPERAND_D;
                 display = "";
                 screen.setText(display);
                 System.out.println("Result: " + result);
@@ -236,17 +273,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -267,17 +319,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -298,17 +365,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -360,17 +442,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -391,17 +488,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -422,17 +534,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case 0:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case 1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -483,17 +610,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case 0:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case 1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -514,17 +656,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case 0:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case 1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -545,17 +702,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
-                    switch (mode) {
-                        case 0:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case 1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
@@ -653,16 +825,18 @@ public class MainActivity extends AppCompatActivity {
                 Button btn = (Button) v;
                 if (display.length() < 5) {
                     precision = FRACTIONAL_NUMBERS;
+                    operand_d = operand_1;
+                    result_d = result;
                     switch (mode) {
                         case RESULT_D:
                             display = display + btn.getText().toString();
                             screen.setText(display);
-                            result_d = Double.parseDouble(display);
+                            //result_d = Double.parseDouble(display);
                             break;
                         case OPERAND_D:
                             display = display + btn.getText().toString();
                             screen.setText(display);
-                            operand_d = Double.parseDouble(display);
+                            //operand_d = Double.parseDouble(display);
                             break;
                     }
                 }
@@ -684,8 +858,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button btn = (Button) v;
                 evaluate(0);
-                display = String.valueOf(result);
-                screen.setText(display);
+                if (precision == WHOLE_NUMBERS) {
+                    display = String.valueOf(result);
+                    screen.setText(display);
+                } else {
+                    display = String.valueOf(result_d);
+                    screen.setText(display);
+                }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
                 System.out.println("Result Decimal: " + result_d);
