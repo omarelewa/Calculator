@@ -14,6 +14,42 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     String display = "";
+    int operand_1 = 0;
+    // 1 = add; 2 = subtract; 3 = multiply; 4 divide; 5 switch_sign; 6 percent; 0 = equals;
+    int operation = 0;
+    int result = 0;
+    int mode = 0;
+    int clear_level = 0;
+
+    // 0 = Error; 1 = Operand 1; 2 = Operand 2; 3 = Result;
+    int view = 1;
+
+    private void evaluate (int next) {
+        switch (operation){
+            case 1:
+                result = operand_1 + result;
+                break;
+            case 2:
+                result = result - operand_1;
+                break;
+            case 3:
+                result = operand_1 * result;
+                break;
+            case 4:
+                result = result / operand_1;
+                break;
+            case 5:
+                result = result * -1;
+                break;
+            case 6:
+                result = result / 100;
+                break;
+            case 0:
+            default:
+                break;
+        }
+        operation = next;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -22,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_main);
         // Create the root layout
         LinearLayout ll = new LinearLayout(this);
+
         // Set root orientation to vertical
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams layoutParamsText = new LinearLayout.LayoutParams(
@@ -54,16 +91,37 @@ public class MainActivity extends AppCompatActivity {
         // Buttons of the row
         Button clear = new Button(this);
         clear.setLayoutParams(layoutParams);
-        clear.setText("C");
+        if (clear_level == 0){
+            clear.setText("AC");
+        }
+        else {
+            clear.setText("C");
+        }
         clear.setLayoutParams(layoutParams);
         clear.setBackgroundColor(0xFFD4D4D2);
-        clear.setPaddingRelative(10,10,10,10);
-
-        clear.setOnClickListener(new View.OnClickListener() {
+        clear.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
+            public void onClick(View v){
+                Button btn = (Button) v;
                 display = "";
+
+                if (clear_level>0){
+                    result = 0;
+                    operand_1 = 0;
+                    mode = 0;
+                    clear_level = 0;
+                    clear.setText("AC");
+                }
+                else {
+                    clear_level = 1;
+                    clear.setText("C");
+                }
                 screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+//                System.out.println(btn.getText().toString());
             }
         });
 
@@ -71,17 +129,64 @@ public class MainActivity extends AppCompatActivity {
         switch_sign.setText("+/-");
         switch_sign.setBackgroundColor(0xFFD4D4D2);
         switch_sign.setLayoutParams(layoutParams);
+        switch_sign.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(0);
+//                display = display + btn.getText().toString();
+//                screen.setText(display);
+//                System.out.println(btn.getText().toString());
+                if (display.length()>0){
+                    result = Integer.parseInt(display) * -1;
+                }
+                display = String.valueOf(result);
+                screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         Button percent = new Button(this);
         percent.setText("%");
         percent.setBackgroundColor(0xFFD4D4D2);
         percent.setLayoutParams(layoutParams);
+        percent.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(0);
+                result = Integer.parseInt(display) / 100;
+                display = String.valueOf(result);
+                screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         Button divide = new Button(this);
         divide.setText("/");
         divide.setBackgroundColor(0xFFFF9500);
         divide.setLayoutParams(layoutParams);
-        //divide.getBackground().setColorFilter(0x00FF9500, PorterDuff.Mode.MULTIPLY);
+        divide.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(4);
+                mode = 1;
+                display = "";
+                screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
+
         // Add buttons to Row1 Layout
         Row1.addView(clear);
         Row1.addView(switch_sign);
@@ -94,11 +199,28 @@ public class MainActivity extends AppCompatActivity {
         seven.setText("7");
         seven.setBackgroundColor(0xFFD4D4D2);
         seven.setLayoutParams(layoutParams);
-        seven.setOnClickListener(new View.OnClickListener() {
+        seven.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "7";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -106,11 +228,28 @@ public class MainActivity extends AppCompatActivity {
         eight.setText("8");
         eight.setBackgroundColor(0xFFD4D4D2);
         eight.setLayoutParams(layoutParams);
-        eight.setOnClickListener(new View.OnClickListener() {
+        eight.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "8";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -118,18 +257,50 @@ public class MainActivity extends AppCompatActivity {
         nine.setText("9");
         nine.setBackgroundColor(0xFFD4D4D2);
         nine.setLayoutParams(layoutParams);
-        nine.setOnClickListener(new View.OnClickListener() {
+        nine.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "9";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
+
         });
 
         Button multiply = new Button(this);
         multiply.setText("x");
         multiply.setBackgroundColor(0xFFFF9500);
         multiply.setLayoutParams(layoutParams);
+        multiply.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(3);
+                mode = 1;
+                display = "";
+                screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         // Add buttons to Row2 Layout
         Row2.addView(seven);
@@ -144,11 +315,28 @@ public class MainActivity extends AppCompatActivity {
         four.setText("4");
         four.setBackgroundColor(0xFFD4D4D2);
         four.setLayoutParams(layoutParams);
-        four.setOnClickListener(new View.OnClickListener() {
+        four.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "4";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -156,11 +344,28 @@ public class MainActivity extends AppCompatActivity {
         five.setText("5");
         five.setBackgroundColor(0xFFD4D4D2);
         five.setLayoutParams(layoutParams);
-        five.setOnClickListener(new View.OnClickListener() {
+        five.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "5";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -168,11 +373,28 @@ public class MainActivity extends AppCompatActivity {
         six.setText("6");
         six.setBackgroundColor(0xFFD4D4D2);
         six.setLayoutParams(layoutParams);
-        six.setOnClickListener(new View.OnClickListener() {
+        six.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "6";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -180,6 +402,20 @@ public class MainActivity extends AppCompatActivity {
         subtract.setText("-");
         subtract.setBackgroundColor(0xFFFF9500);
         subtract.setLayoutParams(layoutParams);
+        subtract.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(2);
+                display = "";
+                screen.setText(display);
+                mode = 1;
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         // Add buttons to Row3 Layout
         Row3.addView(four);
@@ -194,11 +430,28 @@ public class MainActivity extends AppCompatActivity {
         one.setText("1");
         one.setBackgroundColor(0xFFD4D4D2);
         one.setLayoutParams(layoutParams);
-        one.setOnClickListener(new View.OnClickListener() {
+        one.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "1";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -206,11 +459,28 @@ public class MainActivity extends AppCompatActivity {
         two.setText("2");
         two.setBackgroundColor(0xFFD4D4D2);
         two.setLayoutParams(layoutParams);
-        two.setOnClickListener(new View.OnClickListener() {
+        two.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "2";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -218,11 +488,28 @@ public class MainActivity extends AppCompatActivity {
         three.setText("3");
         three.setBackgroundColor(0xFFD4D4D2);
         three.setLayoutParams(layoutParams);
-        three.setOnClickListener(new View.OnClickListener() {
+        three.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "3";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
@@ -230,6 +517,20 @@ public class MainActivity extends AppCompatActivity {
         add.setText("+");
         add.setBackgroundColor(0xFFFF9500);
         add.setLayoutParams(layoutParams);
+        add.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(1);
+                display = "";
+                screen.setText(display);
+                mode = 1;
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         // Add buttons to Row4 Layout
         Row4.addView(one);
@@ -244,36 +545,77 @@ public class MainActivity extends AppCompatActivity {
         zero.setText("0");
         zero.setBackgroundColor(0xFFD4D4D2);
         zero.setLayoutParams(layoutParams2);
-        zero.setOnClickListener(new View.OnClickListener() {
+        zero.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + "0";
-                screen.setText(display);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
 
         Button decimal_point = new Button(this);
         decimal_point.setText(".");
-//        decimal_point.setId(R.id.decimal_point);
         decimal_point.setBackgroundColor(0xFFD4D4D2);
         decimal_point.setLayoutParams(layoutParams);
-        decimal_point.setOnClickListener(new View.OnClickListener() {
+        decimal_point.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                display = display + ".";
-                //Log.i("decimal", v.getAccessibilityClassName().toString());
-                screen.setText(display);
-                System.out.println("Omarrrrrr");
-                System.out.println(v.getAccessibilityClassName().toString());
-                System.out.println(Integer.parseInt(nine.getText().toString())+3);
+            public void onClick(View v){
+                Button btn = (Button) v;
+                if (display.length() < 5){
+                    switch (mode){
+                        case 0:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            result = Integer.parseInt(display);
+                            break;
+                        case 1:
+                            display = display + btn.getText().toString();
+                            screen.setText(display);
+                            operand_1 = Integer.parseInt(display);
+                            break;
+                    }
+                }
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
             }
         });
-
 
         Button equals = new Button(this);
         equals.setText("=");
         equals.setBackgroundColor(0xFFFF9500);
         equals.setLayoutParams(layoutParams);
+        equals.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Button btn = (Button) v;
+                evaluate(0);
+                display = String.valueOf(result);
+                screen.setText(display);
+                System.out.println("Result: " + result);
+                System.out.println("Operand 1: " + operand_1);
+                System.out.println("Operation: " + operation);
+                System.out.println("Mode: " + mode);
+            }
+        });
 
         // Add buttons to Row5 Layout
         Row5.addView(zero);
@@ -287,6 +629,10 @@ public class MainActivity extends AppCompatActivity {
         ll.addView(Row3);
         ll.addView(Row4);
         ll.addView(Row5);
+
         setContentView(ll);
+
+
     }
+
 }
