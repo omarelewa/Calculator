@@ -13,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    String display = "";
-
     private static final int EQUALS = 0;
     private static final int ADD = 1;
     private static final int SUBTRACT = 2;
@@ -23,25 +21,33 @@ public class MainActivity extends AppCompatActivity {
     private static final int SWITCH_SIGN = 5;
     private static final int PERCENT = 6;
 
+    private static final int WHOLE_NUMBERS = 0;
+    private static final int FRACTIONAL_NUMBERS = 1;
+
     private static final int RESULT = 0;
     private static final int OPERAND_1 = 1;
+    private static final int RESULT_D = 10;
+    private static final int OPERAND_D = 11;
 
     private static final int AC = 0;
     private static final int C = 1;
 
+    String display = "";
     int operand_1 = 0;
-    // 1 = add; 2 = subtract; 3 = multiply; 4 divide; 5 switch_sign; 6 percent; 0 = equals;
-    int operation = EQUALS;
-
     int result = 0;
+    double operand_d = 0.0;
+    double result_d = 0.0;
+
+    int operation = EQUALS;
     int mode = RESULT;
     int clear_level = AC;
+    int precision = WHOLE_NUMBERS;
 
     // 0 = Error; 1 = Operand 1; 2 = Operand 2; 3 = Result;
     int view = 1;
 
-    private void evaluate (int next) {
-        switch (operation){
+    private void evaluate(int next) {
+        switch (operation) {
             case 1:
                 result = operand_1 + result;
                 break;
@@ -52,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 result = operand_1 * result;
                 break;
             case 4:
-                result = result / operand_1;
+                result_d = result_d / operand_d;
                 break;
             case 5:
                 result = result * -1;
@@ -81,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 2000,
                 320,
                 2
-         );
+        );
 
         // Create TextView to hold the answers screen
         TextView screen = new TextView(this);
@@ -107,34 +113,37 @@ public class MainActivity extends AppCompatActivity {
         // Buttons of the row
         Button clear = new Button(this);
         clear.setLayoutParams(layoutParams);
-        if (clear_level == 0){
+        if (clear_level == AC) {
             clear.setText("AC");
-        }
-        else {
+        } else {
             clear.setText("C");
         }
         clear.setLayoutParams(layoutParams);
         clear.setBackgroundColor(0xFFD4D4D2);
-        clear.setOnClickListener(new View.OnClickListener(){
+        clear.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
                 display = "";
 
-                if (clear_level>0){
+                if (clear_level > 0) {
                     result = 0;
+                    result_d = 0;
                     operand_1 = 0;
-                    mode = 0;
-                    clear_level = 0;
+                    operand_d = 0;
+                    mode = RESULT;
+                    precision = WHOLE_NUMBERS;
+                    clear_level = AC;
                     clear.setText("AC");
-                }
-                else {
-                    clear_level = 1;
+                } else {
+                    clear_level = C;
                     clear.setText("C");
                 }
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result: " + result_d);
+                System.out.println("Operand 1: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
 //                System.out.println(btn.getText().toString());
@@ -145,21 +154,23 @@ public class MainActivity extends AppCompatActivity {
         switch_sign.setText("+/-");
         switch_sign.setBackgroundColor(0xFFD4D4D2);
         switch_sign.setLayoutParams(layoutParams);
-        switch_sign.setOnClickListener(new View.OnClickListener(){
+        switch_sign.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(0);
+                evaluate(EQUALS);
 //                display = display + btn.getText().toString();
 //                screen.setText(display);
 //                System.out.println(btn.getText().toString());
-                if (display.length()>0){
+                if (display.length() > 0) {
                     result = Integer.parseInt(display) * -1;
                 }
                 display = String.valueOf(result);
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -169,16 +180,19 @@ public class MainActivity extends AppCompatActivity {
         percent.setText("%");
         percent.setBackgroundColor(0xFFD4D4D2);
         percent.setLayoutParams(layoutParams);
-        percent.setOnClickListener(new View.OnClickListener(){
+        percent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(0);
-                result = Integer.parseInt(display) / 100;
-                display = String.valueOf(result);
+                precision = FRACTIONAL_NUMBERS;
+                evaluate(EQUALS);
+                result_d = Double.parseDouble(display) / 100;
+                display = String.valueOf(result_d);
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -188,16 +202,18 @@ public class MainActivity extends AppCompatActivity {
         divide.setText("/");
         divide.setBackgroundColor(0xFFFF9500);
         divide.setLayoutParams(layoutParams);
-        divide.setOnClickListener(new View.OnClickListener(){
+        divide.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(4);
+                evaluate(DIVIDE);
                 mode = 1;
                 display = "";
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -215,18 +231,18 @@ public class MainActivity extends AppCompatActivity {
         seven.setText("7");
         seven.setBackgroundColor(0xFFD4D4D2);
         seven.setLayoutParams(layoutParams);
-        seven.setOnClickListener(new View.OnClickListener(){
+        seven.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    switch (mode) {
+                        case RESULT:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             result = Integer.parseInt(display);
                             break;
-                        case 1:
+                        case OPERAND_1:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             operand_1 = Integer.parseInt(display);
@@ -235,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -244,18 +262,18 @@ public class MainActivity extends AppCompatActivity {
         eight.setText("8");
         eight.setBackgroundColor(0xFFD4D4D2);
         eight.setLayoutParams(layoutParams);
-        eight.setOnClickListener(new View.OnClickListener(){
+        eight.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    switch (mode) {
+                        case RESULT:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             result = Integer.parseInt(display);
                             break;
-                        case 1:
+                        case OPERAND_1:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             operand_1 = Integer.parseInt(display);
@@ -264,6 +282,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -273,18 +293,18 @@ public class MainActivity extends AppCompatActivity {
         nine.setText("9");
         nine.setBackgroundColor(0xFFD4D4D2);
         nine.setLayoutParams(layoutParams);
-        nine.setOnClickListener(new View.OnClickListener(){
+        nine.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    switch (mode) {
+                        case RESULT:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             result = Integer.parseInt(display);
                             break;
-                        case 1:
+                        case OPERAND_1:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             operand_1 = Integer.parseInt(display);
@@ -293,6 +313,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -303,16 +325,18 @@ public class MainActivity extends AppCompatActivity {
         multiply.setText("x");
         multiply.setBackgroundColor(0xFFFF9500);
         multiply.setLayoutParams(layoutParams);
-        multiply.setOnClickListener(new View.OnClickListener(){
+        multiply.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(3);
-                mode = 1;
+                evaluate(MULTIPLY);
+                mode = OPERAND_1;
                 display = "";
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -331,18 +355,18 @@ public class MainActivity extends AppCompatActivity {
         four.setText("4");
         four.setBackgroundColor(0xFFD4D4D2);
         four.setLayoutParams(layoutParams);
-        four.setOnClickListener(new View.OnClickListener(){
+        four.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    switch (mode) {
+                        case RESULT:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             result = Integer.parseInt(display);
                             break;
-                        case 1:
+                        case OPERAND_1:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             operand_1 = Integer.parseInt(display);
@@ -351,6 +375,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -360,18 +386,18 @@ public class MainActivity extends AppCompatActivity {
         five.setText("5");
         five.setBackgroundColor(0xFFD4D4D2);
         five.setLayoutParams(layoutParams);
-        five.setOnClickListener(new View.OnClickListener(){
+        five.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    switch (mode) {
+                        case RESULT:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             result = Integer.parseInt(display);
                             break;
-                        case 1:
+                        case OPERAND_1:
                             display = display + btn.getText().toString();
                             screen.setText(display);
                             operand_1 = Integer.parseInt(display);
@@ -380,6 +406,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -389,12 +417,12 @@ public class MainActivity extends AppCompatActivity {
         six.setText("6");
         six.setBackgroundColor(0xFFD4D4D2);
         six.setLayoutParams(layoutParams);
-        six.setOnClickListener(new View.OnClickListener(){
+        six.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
+                if (display.length() < 5) {
+                    switch (mode) {
                         case 0:
                             display = display + btn.getText().toString();
                             screen.setText(display);
@@ -409,6 +437,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -418,16 +448,18 @@ public class MainActivity extends AppCompatActivity {
         subtract.setText("-");
         subtract.setBackgroundColor(0xFFFF9500);
         subtract.setLayoutParams(layoutParams);
-        subtract.setOnClickListener(new View.OnClickListener(){
+        subtract.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(2);
+                evaluate(SUBTRACT);
                 display = "";
                 screen.setText(display);
                 mode = 1;
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -446,12 +478,12 @@ public class MainActivity extends AppCompatActivity {
         one.setText("1");
         one.setBackgroundColor(0xFFD4D4D2);
         one.setLayoutParams(layoutParams);
-        one.setOnClickListener(new View.OnClickListener(){
+        one.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
+                if (display.length() < 5) {
+                    switch (mode) {
                         case 0:
                             display = display + btn.getText().toString();
                             screen.setText(display);
@@ -466,6 +498,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -475,12 +509,12 @@ public class MainActivity extends AppCompatActivity {
         two.setText("2");
         two.setBackgroundColor(0xFFD4D4D2);
         two.setLayoutParams(layoutParams);
-        two.setOnClickListener(new View.OnClickListener(){
+        two.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
+                if (display.length() < 5) {
+                    switch (mode) {
                         case 0:
                             display = display + btn.getText().toString();
                             screen.setText(display);
@@ -495,6 +529,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -504,12 +540,12 @@ public class MainActivity extends AppCompatActivity {
         three.setText("3");
         three.setBackgroundColor(0xFFD4D4D2);
         three.setLayoutParams(layoutParams);
-        three.setOnClickListener(new View.OnClickListener(){
+        three.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
+                if (display.length() < 5) {
+                    switch (mode) {
                         case 0:
                             display = display + btn.getText().toString();
                             screen.setText(display);
@@ -524,6 +560,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -533,16 +571,18 @@ public class MainActivity extends AppCompatActivity {
         add.setText("+");
         add.setBackgroundColor(0xFFFF9500);
         add.setLayoutParams(layoutParams);
-        add.setOnClickListener(new View.OnClickListener(){
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                evaluate(1);
+                evaluate(ADD);
                 display = "";
                 screen.setText(display);
                 mode = 1;
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -561,26 +601,43 @@ public class MainActivity extends AppCompatActivity {
         zero.setText("0");
         zero.setBackgroundColor(0xFFD4D4D2);
         zero.setLayoutParams(layoutParams2);
-        zero.setOnClickListener(new View.OnClickListener(){
+        zero.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case 1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
+                if (display.length() < 5) {
+                    if (precision == WHOLE_NUMBERS) {
+                        switch (mode) {
+                            case RESULT:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result = Integer.parseInt(display);
+                                break;
+                            case OPERAND_1:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_1 = Integer.parseInt(display);
+                                break;
+                        }
+                    } else {
+                        switch (mode) {
+                            case RESULT_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                result_d = Double.parseDouble(display);
+                                break;
+                            case OPERAND_D:
+                                display = display + btn.getText().toString();
+                                screen.setText(display);
+                                operand_d = Double.parseDouble(display);
+                                break;
+                        }
                     }
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -590,26 +647,29 @@ public class MainActivity extends AppCompatActivity {
         decimal_point.setText(".");
         decimal_point.setBackgroundColor(0xFFD4D4D2);
         decimal_point.setLayoutParams(layoutParams);
-        decimal_point.setOnClickListener(new View.OnClickListener(){
+        decimal_point.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
-                if (display.length() < 5){
-                    switch (mode){
-                        case 0:
+                if (display.length() < 5) {
+                    precision = FRACTIONAL_NUMBERS;
+                    switch (mode) {
+                        case RESULT_D:
                             display = display + btn.getText().toString();
                             screen.setText(display);
-                            result = Integer.parseInt(display);
+                            result_d = Double.parseDouble(display);
                             break;
-                        case 1:
+                        case OPERAND_D:
                             display = display + btn.getText().toString();
                             screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
+                            operand_d = Double.parseDouble(display);
                             break;
                     }
                 }
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
@@ -619,15 +679,17 @@ public class MainActivity extends AppCompatActivity {
         equals.setText("=");
         equals.setBackgroundColor(0xFFFF9500);
         equals.setLayoutParams(layoutParams);
-        equals.setOnClickListener(new View.OnClickListener(){
+        equals.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Button btn = (Button) v;
                 evaluate(0);
                 display = String.valueOf(result);
                 screen.setText(display);
                 System.out.println("Result: " + result);
                 System.out.println("Operand 1: " + operand_1);
+                System.out.println("Result Decimal: " + result_d);
+                System.out.println("Operand Decimal: " + operand_d);
                 System.out.println("Operation: " + operation);
                 System.out.println("Mode: " + mode);
             }
