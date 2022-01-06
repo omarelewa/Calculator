@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,28 +19,24 @@ public class MainActivity extends AppCompatActivity {
     private static final int SUBTRACT = 2;
     private static final int MULTIPLY = 3;
     private static final int DIVIDE = 4;
-
     private static final int WHOLE_NUMBERS = 0;
     private static final int FRACTIONAL_NUMBERS = 1;
-
     private static final int RESULT = 0;
     private static final int OPERAND_1 = 1;
     private static final int RESULT_D = 0;
     private static final int OPERAND_D = 1;
-
     private static final int AC = 0;
     private static final int C = 1;
-
     String display = "";
     int operand_1 = 0;
     int result = 0;
     double operand_d = 0.0;
     double result_d = 0.0;
-
     int operation = EQUALS;
     int mode = RESULT;
     int clear_level = AC;
     int precision = WHOLE_NUMBERS;
+    private Model model;
 
     private void evaluate(int next) {
         if (precision == WHOLE_NUMBERS) {
@@ -105,11 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Set root orientation to vertical
         ll.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams layoutParamsText = new LinearLayout.LayoutParams(
-                2000,
-                320,
-                2
-        );
+        LinearLayout.LayoutParams layoutParamsText = setLayoutParams();
 
         // Create TextView to hold the answers screen
         TextView screen = new TextView(this);
@@ -140,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             clear.setText("C");
         }
-        clear.setLayoutParams(layoutParams);
-        clear.setBackgroundColor(0xFFD4D4D2);
+        button_design(layoutParams, clear);
         clear.setOnClickListener(v -> {
             display = "";
 
@@ -159,24 +151,14 @@ public class MainActivity extends AppCompatActivity {
                 clear.setText("C");
             }
             screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result: " + result_d);
-            System.out.println("Operand 1: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-//                System.out.println(btn.getText().toString());
+            debugger_System_Out("Result: ", "Operand 1: ");
         });
 
         Button switch_sign = new Button(this);
         switch_sign.setText("+/-");
-        switch_sign.setBackgroundColor(0xFFD4D4D2);
-        switch_sign.setLayoutParams(layoutParams);
+        button_design(layoutParams, switch_sign);
+
         switch_sign.setOnClickListener(v -> {
-            //                evaluate(EQUALS);
-//                display = display + btn.getText().toString();
-//                screen.setText(display);
-//                System.out.println(btn.getText().toString());
             if (precision == WHOLE_NUMBERS) {
                 if (display.length() > 0) {
                     result = Integer.parseInt(display) * -1;
@@ -189,17 +171,10 @@ public class MainActivity extends AppCompatActivity {
                 display = String.valueOf(result_d);
             }
             screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
-        Button percent = new Button(this);
-        percent.setText("%");
-        percent.setBackgroundColor(0xFFD4D4D2);
+        Button percent = create_functionality_button("%", 0xFFD4D4D2);
         percent.setLayoutParams(layoutParams);
         percent.setOnClickListener(v -> {
             precision = FRACTIONAL_NUMBERS;
@@ -207,17 +182,10 @@ public class MainActivity extends AppCompatActivity {
             result_d = Double.parseDouble(display) / 100;
             display = String.valueOf(result_d);
             screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
-        Button divide = new Button(this);
-        divide.setText("/");
-        divide.setBackgroundColor(0xFFFF9500);
+        Button divide = create_functionality_button("/", 0xFFFF9500);
         divide.setLayoutParams(layoutParams);
         divide.setOnClickListener(v -> {
             evaluate(DIVIDE);
@@ -227,489 +195,153 @@ public class MainActivity extends AppCompatActivity {
             mode = OPERAND_D;
             display = "";
             screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row1 Layout
-        Row1.addView(clear);
-        Row1.addView(switch_sign);
-        Row1.addView(percent);
-        Row1.addView(divide);
+        render_row(Row1, clear, switch_sign, percent, divide);
 
         // Row 2
         LinearLayout Row2 = new LinearLayout(this);
         Button seven = new Button(this);
         seven.setText("7");
-        seven.setBackgroundColor(0xFFD4D4D2);
-        seven.setLayoutParams(layoutParams);
-        seven.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, seven);
 
         Button eight = new Button(this);
         eight.setText("8");
-        eight.setBackgroundColor(0xFFD4D4D2);
-        eight.setLayoutParams(layoutParams);
-        eight.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, eight);
 
         Button nine = new Button(this);
         nine.setText("9");
-        nine.setBackgroundColor(0xFFD4D4D2);
-        nine.setLayoutParams(layoutParams);
-        nine.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, nine);
 
-        Button multiply = new Button(this);
-        multiply.setText("x");
-        multiply.setBackgroundColor(0xFFFF9500);
+        Button multiply = create_functionality_button("x", 0xFFFF9500);
         multiply.setLayoutParams(layoutParams);
         multiply.setOnClickListener(v -> {
             evaluate(MULTIPLY);
             mode = OPERAND_1;
             display = "";
             screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row2 Layout
-        Row2.addView(seven);
-        Row2.addView(eight);
-        Row2.addView(nine);
-        Row2.addView(multiply);
+        render_row(Row2, seven, eight, nine, multiply);
 
         // Row 3
         LinearLayout Row3 = new LinearLayout(this);
 
         Button four = new Button(this);
         four.setText("4");
-        four.setBackgroundColor(0xFFD4D4D2);
-        four.setLayoutParams(layoutParams);
-        four.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, four);
 
         Button five = new Button(this);
         five.setText("5");
-        five.setBackgroundColor(0xFFD4D4D2);
-        five.setLayoutParams(layoutParams);
-        five.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, five);
 
         Button six = new Button(this);
         six.setText("6");
-        six.setBackgroundColor(0xFFD4D4D2);
-        six.setLayoutParams(layoutParams);
-        six.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, six);
 
-        Button subtract = new Button(this);
-        subtract.setText("-");
-        subtract.setBackgroundColor(0xFFFF9500);
+        Button subtract = create_functionality_button("-", 0xFFFF9500);
         subtract.setLayoutParams(layoutParams);
         subtract.setOnClickListener(v -> {
             evaluate(SUBTRACT);
             display = "";
             screen.setText(display);
             mode = 1;
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row3 Layout
-        Row3.addView(four);
-        Row3.addView(five);
-        Row3.addView(six);
-        Row3.addView(subtract);
+        render_row(Row3, four, five, six, subtract);
 
         // Row 4
         LinearLayout Row4 = new LinearLayout(this);
 
         Button one = new Button(this);
         one.setText("1");
-        one.setBackgroundColor(0xFFD4D4D2);
-        one.setLayoutParams(layoutParams);
-        one.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, one);
 
         Button two = new Button(this);
         two.setText("2");
-        two.setBackgroundColor(0xFFD4D4D2);
-        two.setLayoutParams(layoutParams);
-        two.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, two);
 
         Button three = new Button(this);
         three.setText("3");
-        three.setBackgroundColor(0xFFD4D4D2);
-        three.setLayoutParams(layoutParams);
-        three.setOnClickListener(v -> {
-            Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
-            }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+        number_button(screen, layoutParams, three);
 
-        Button add = new Button(this);
-        add.setText("+");
-        add.setBackgroundColor(0xFFFF9500);
+        Button add = create_functionality_button("+", 0xFFFF9500);
         add.setLayoutParams(layoutParams);
         add.setOnClickListener(v -> {
             evaluate(ADD);
             display = "";
             screen.setText(display);
             mode = 1;
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row4 Layout
-        Row4.addView(one);
-        Row4.addView(two);
-        Row4.addView(three);
-        Row4.addView(add);
+        render_row(Row4, one, two, three, add);
 
         // Row 5
         LinearLayout Row5 = new LinearLayout(this);
 
         Button zero = new Button(this);
         zero.setText("0");
+        number_button(screen, layoutParams2, zero);
+
+        Button decimal_point = create_functionality_button(".", 0xFFD4D4D2);
+        decimal_point.setLayoutParams(layoutParams);
+        button_functionality(screen, decimal_point);
+
+        Button equals = create_functionality_button("=", 0xFFFF9500);
+        equals.setLayoutParams(layoutParams);
+        equals.setOnClickListener(v -> {
+            evaluate(0);
+            if (precision == WHOLE_NUMBERS) {
+                display = String.valueOf(result);
+            } else {
+                display = String.valueOf(result_d);
+            }
+            screen.setText(display);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+        });
+
+        // Add buttons to Row5 Layout
+        Row5.addView(zero);
+        Row5.addView(decimal_point);
+        Row5.addView(equals);
+
+        // Last part add components to the root layout
+        ll.addView(screen);
+        ll.addView(Row1);
+        ll.addView(Row2);
+        ll.addView(Row3);
+        ll.addView(Row4);
+        ll.addView(Row5);
+
+        setContentView(ll);
+
+
+    }
+
+    @NonNull
+    private Button create_functionality_button(String s, int i) {
+        Button equals = new Button(this);
+        equals.setText(s);
+        equals.setBackgroundColor(i);
+        return equals;
+    }
+
+    private void render_row(LinearLayout row1, Button clear, Button switch_sign, Button percent, Button divide) {
+        row1.addView(clear);
+        row1.addView(switch_sign);
+        row1.addView(percent);
+        row1.addView(divide);
+    }
+
+    private void number_button(TextView screen, LinearLayout.LayoutParams layoutParams2, Button zero) {
         zero.setBackgroundColor(0xFFD4D4D2);
         zero.setLayoutParams(layoutParams2);
         zero.setOnClickListener(v -> {
@@ -743,18 +375,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
+    }
 
-        Button decimal_point = new Button(this);
-        decimal_point.setText(".");
-        decimal_point.setBackgroundColor(0xFFD4D4D2);
-        decimal_point.setLayoutParams(layoutParams);
+    private void button_functionality(TextView screen, Button decimal_point) {
         decimal_point.setOnClickListener(v -> {
             Button btn = (Button) v;
             if (display.length() < 5) {
@@ -771,50 +396,31 @@ public class MainActivity extends AppCompatActivity {
                     //operand_d = Double.parseDouble(display);
                 }
             }
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
+            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
+    }
 
-        Button equals = new Button(this);
-        equals.setText("=");
-        equals.setBackgroundColor(0xFFFF9500);
-        equals.setLayoutParams(layoutParams);
-        equals.setOnClickListener(v -> {
-            evaluate(0);
-            if (precision == WHOLE_NUMBERS) {
-                display = String.valueOf(result);
-            } else {
-                display = String.valueOf(result_d);
-            }
-            screen.setText(display);
-            System.out.println("Result: " + result);
-            System.out.println("Operand 1: " + operand_1);
-            System.out.println("Result Decimal: " + result_d);
-            System.out.println("Operand Decimal: " + operand_d);
-            System.out.println("Operation: " + operation);
-            System.out.println("Mode: " + mode);
-        });
+    private void debugger_System_Out(String s, String s2) {
+        System.out.println("Result: " + result);
+        System.out.println("Operand 1: " + operand_1);
+        System.out.println(s + result_d);
+        System.out.println(s2 + operand_d);
+        System.out.println("Operation: " + operation);
+        System.out.println("Mode: " + mode);
+    }
 
-        // Add buttons to Row5 Layout
-        Row5.addView(zero);
-        Row5.addView(decimal_point);
-        Row5.addView(equals);
+    private void button_design(LinearLayout.LayoutParams layoutParams, @NonNull Button clear) {
+        clear.setLayoutParams(layoutParams);
+        clear.setBackgroundColor(0xFFD4D4D2);
+    }
 
-        // Last part add components to the root layout
-        ll.addView(screen);
-        ll.addView(Row1);
-        ll.addView(Row2);
-        ll.addView(Row3);
-        ll.addView(Row4);
-        ll.addView(Row5);
-
-        setContentView(ll);
-
-
+    @NonNull
+    private LinearLayout.LayoutParams setLayoutParams() {
+        return new LinearLayout.LayoutParams(
+                2000,
+                320,
+                2
+        );
     }
 
 }
