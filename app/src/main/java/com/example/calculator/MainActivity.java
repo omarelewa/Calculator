@@ -14,82 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int EQUALS = 0;
-    private static final int ADD = 1;
-    private static final int SUBTRACT = 2;
-    private static final int MULTIPLY = 3;
-    private static final int DIVIDE = 4;
-    private static final int WHOLE_NUMBERS = 0;
-    private static final int FRACTIONAL_NUMBERS = 1;
-    private static final int RESULT = 0;
-    private static final int OPERAND_1 = 1;
-    private static final int RESULT_D = 0;
-    private static final int OPERAND_D = 1;
-    private static final int AC = 0;
-    private static final int C = 1;
-    String display = "";
-    int operand_1 = 0;
-    int result = 0;
-    double operand_d = 0.0;
-    double result_d = 0.0;
-    int operation = EQUALS;
-    int mode = RESULT;
-    int clear_level = AC;
-    int precision = WHOLE_NUMBERS;
     private Model model;
-
-    private void evaluate(int next) {
-        if (precision == WHOLE_NUMBERS) {
-            switch (operation) {
-                case 1:
-                    result = operand_1 + result;
-                    break;
-                case 2:
-                    result = result - operand_1;
-                    break;
-                case 3:
-                    result = operand_1 * result;
-                    break;
-                case 4:
-                    result_d = result_d / operand_d;
-                    break;
-                case 5:
-                    result = result * -1;
-                    break;
-                case 6:
-                    result = result / 100;
-                    break;
-                case 0:
-                default:
-                    break;
-            }
-        } else {
-            switch (operation) {
-                case 1:
-                    result_d = operand_d + result_d;
-                    break;
-                case 2:
-                    result_d = result_d - operand_d;
-                    break;
-                case 3:
-                    result_d = operand_d * result_d;
-                    break;
-                case 4:
-                    result_d = result_d / operand_d;
-                    break;
-                case 5:
-                    result_d = result_d * -1;
-                    break;
-                case 6:
-                    result_d = result_d / 100;
-                    break;
-                case 0:
-                default:
-                    break;
-            }
-        }
-        operation = next;
-    }
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -97,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
+        model = new Model();
+
         // Create the root layout
         LinearLayout ll = new LinearLayout(this);
 
@@ -128,30 +55,17 @@ public class MainActivity extends AppCompatActivity {
         // Buttons of the row
         Button clear = new Button(this);
         clear.setLayoutParams(layoutParams);
-        if (clear_level == AC) {
+        if (model.clear_level == Model.AC) {
             clear.setText("AC");
         } else {
             clear.setText("C");
         }
         button_design(layoutParams, clear);
         clear.setOnClickListener(v -> {
-            display = "";
+            clear_button(clear);
 
-            if (clear_level > 0) {
-                result = 0;
-                result_d = 0;
-                operand_1 = 0;
-                operand_d = 0;
-                mode = RESULT;
-                precision = WHOLE_NUMBERS;
-                clear_level = AC;
-                clear.setText("AC");
-            } else {
-                clear_level = C;
-                clear.setText("C");
-            }
-            screen.setText(display);
-            debugger_System_Out("Result: ", "Operand 1: ");
+            screen.setText(model.display);
+            model.debugger_System_Out("Result: ", "Operand 1: ");
         });
 
         Button switch_sign = new Button(this);
@@ -159,43 +73,43 @@ public class MainActivity extends AppCompatActivity {
         button_design(layoutParams, switch_sign);
 
         switch_sign.setOnClickListener(v -> {
-            if (precision == WHOLE_NUMBERS) {
-                if (display.length() > 0) {
-                    result = Integer.parseInt(display) * -1;
+            if (model.precision == Model.WHOLE_NUMBERS) {
+                if (model.display.length() > 0) {
+                    model.result = Integer.parseInt(model.display) * -1;
                 }
-                display = String.valueOf(result);
+                model.display = String.valueOf(model.result);
             } else {
-                if (display.length() > 0) {
-                    result_d = Double.parseDouble(display) * -1;
+                if (model.display.length() > 0) {
+                    model.result_d = Double.parseDouble(model.display) * -1;
                 }
-                display = String.valueOf(result_d);
+                model.display = String.valueOf(model.result_d);
             }
-            screen.setText(display);
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            screen.setText(model.display);
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         Button percent = create_functionality_button("%", 0xFFD4D4D2);
         percent.setLayoutParams(layoutParams);
         percent.setOnClickListener(v -> {
-            precision = FRACTIONAL_NUMBERS;
-            evaluate(EQUALS);
-            result_d = Double.parseDouble(display) / 100;
-            display = String.valueOf(result_d);
-            screen.setText(display);
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.precision = Model.FRACTIONAL_NUMBERS;
+            model.evaluate(Model.EQUALS);
+            model.result_d = Double.parseDouble(model.display) / 100;
+            model.display = String.valueOf(model.result_d);
+            screen.setText(model.display);
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         Button divide = create_functionality_button("/", 0xFFFF9500);
         divide.setLayoutParams(layoutParams);
         divide.setOnClickListener(v -> {
-            evaluate(DIVIDE);
-            precision = FRACTIONAL_NUMBERS;
-            result_d = result;
-            operand_d = operand_1;
-            mode = OPERAND_D;
-            display = "";
-            screen.setText(display);
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.evaluate(Model.DIVIDE);
+            model.precision = Model.FRACTIONAL_NUMBERS;
+            model.result_d = model.result;
+            model.operand_d = model.operand_1;
+            model.mode = Model.OPERAND_D;
+            model.display = "";
+            screen.setText(model.display);
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row1 Layout
@@ -218,11 +132,11 @@ public class MainActivity extends AppCompatActivity {
         Button multiply = create_functionality_button("x", 0xFFFF9500);
         multiply.setLayoutParams(layoutParams);
         multiply.setOnClickListener(v -> {
-            evaluate(MULTIPLY);
-            mode = OPERAND_1;
-            display = "";
-            screen.setText(display);
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.evaluate(Model.MULTIPLY);
+            model.mode = Model.OPERAND_1;
+            model.display = "";
+            screen.setText(model.display);
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row2 Layout
@@ -246,11 +160,11 @@ public class MainActivity extends AppCompatActivity {
         Button subtract = create_functionality_button("-", 0xFFFF9500);
         subtract.setLayoutParams(layoutParams);
         subtract.setOnClickListener(v -> {
-            evaluate(SUBTRACT);
-            display = "";
-            screen.setText(display);
-            mode = 1;
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.evaluate(Model.SUBTRACT);
+            model.display = "";
+            screen.setText(model.display);
+            model.mode = 1;
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row3 Layout
@@ -274,11 +188,11 @@ public class MainActivity extends AppCompatActivity {
         Button add = create_functionality_button("+", 0xFFFF9500);
         add.setLayoutParams(layoutParams);
         add.setOnClickListener(v -> {
-            evaluate(ADD);
-            display = "";
-            screen.setText(display);
-            mode = 1;
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.evaluate(Model.ADD);
+            model.display = "";
+            screen.setText(model.display);
+            model.mode = 1;
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row4 Layout
@@ -298,14 +212,14 @@ public class MainActivity extends AppCompatActivity {
         Button equals = create_functionality_button("=", 0xFFFF9500);
         equals.setLayoutParams(layoutParams);
         equals.setOnClickListener(v -> {
-            evaluate(0);
-            if (precision == WHOLE_NUMBERS) {
-                display = String.valueOf(result);
+            model.evaluate(0);
+            if (model.precision == Model.WHOLE_NUMBERS) {
+                model.display = String.valueOf(model.result);
             } else {
-                display = String.valueOf(result_d);
+                model.display = String.valueOf(model.result_d);
             }
-            screen.setText(display);
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            screen.setText(model.display);
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
 
         // Add buttons to Row5 Layout
@@ -322,8 +236,18 @@ public class MainActivity extends AppCompatActivity {
         ll.addView(Row5);
 
         setContentView(ll);
+    }
 
+    private void clear_button(Button clear) {
+        model.display = "";
 
+        if (model.clear_level > 0) {
+            model.clear_level_operation();
+            clear.setText("AC");
+        } else {
+            model.clear_level = Model.C;
+            clear.setText("C");
+        }
     }
 
     @NonNull
@@ -346,67 +270,34 @@ public class MainActivity extends AppCompatActivity {
         zero.setLayoutParams(layoutParams2);
         zero.setOnClickListener(v -> {
             Button btn = (Button) v;
-            if (display.length() < 5) {
-                if (precision == WHOLE_NUMBERS) {
-                    switch (mode) {
-                        case RESULT:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result = Integer.parseInt(display);
-                            break;
-                        case OPERAND_1:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_1 = Integer.parseInt(display);
-                            break;
-                    }
-                } else {
-                    switch (mode) {
-                        case RESULT_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            result_d = Double.parseDouble(display);
-                            break;
-                        case OPERAND_D:
-                            display = display + btn.getText().toString();
-                            screen.setText(display);
-                            operand_d = Double.parseDouble(display);
-                            break;
-                    }
-                }
+            model.display = model.display + btn.getText().toString();
+            if (model.display.length() < 5) {
+                model.number_button_actions();
+                screen.setText(model.display);
             }
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
     }
 
     private void button_functionality(TextView screen, Button decimal_point) {
         decimal_point.setOnClickListener(v -> {
             Button btn = (Button) v;
-            if (display.length() < 5) {
-                precision = FRACTIONAL_NUMBERS;
-                operand_d = operand_1;
-                result_d = result;
-                switch (mode) {
-                    case RESULT_D:
-                    case OPERAND_D:
-                        display = display + btn.getText().toString();
-                        screen.setText(display);
+            if (model.display.length() < 5) {
+                model.precision = Model.FRACTIONAL_NUMBERS;
+                model.operand_d = model.operand_1;
+                model.result_d = model.result;
+                switch (model.mode) {
+                    case Model.RESULT_D:
+                    case Model.OPERAND_D:
+                        model.display = model.display + btn.getText().toString();
+                        screen.setText(model.display);
                         //result_d = Double.parseDouble(display);
                         break;
                     //operand_d = Double.parseDouble(display);
                 }
             }
-            debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
+            model.debugger_System_Out("Result Decimal: ", "Operand Decimal: ");
         });
-    }
-
-    private void debugger_System_Out(String s, String s2) {
-        System.out.println("Result: " + result);
-        System.out.println("Operand 1: " + operand_1);
-        System.out.println(s + result_d);
-        System.out.println(s2 + operand_d);
-        System.out.println("Operation: " + operation);
-        System.out.println("Mode: " + mode);
     }
 
     private void button_design(LinearLayout.LayoutParams layoutParams, @NonNull Button clear) {
