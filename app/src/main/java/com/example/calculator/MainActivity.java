@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    String display = "";
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +62,10 @@ public class MainActivity extends AppCompatActivity {
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                	screen.setText("");
+                display = "";
+                screen.setText(display);
             }
         });
-
-
 
         Button switch_sign = new Button(this);
         switch_sign.setText("+/-");
@@ -96,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
         seven.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("7");
+                display = display + "7";
+                screen.setText(display);
             }
         });
 
@@ -107,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
         eight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("8");
+                display = display + "8";
+                screen.setText(display);
             }
         });
 
@@ -118,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
         nine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("9");
+                display = display + "9";
+                screen.setText(display);
             }
         });
 
@@ -143,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
         four.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("4");
+                display = display + "4";
+                screen.setText(display);
             }
         });
 
@@ -154,7 +159,8 @@ public class MainActivity extends AppCompatActivity {
         five.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("5");
+                display = display + "5";
+                screen.setText(display);
             }
         });
 
@@ -165,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
         six.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("6");
+                display = display + "6";
+                screen.setText(display);
             }
         });
 
@@ -190,7 +197,8 @@ public class MainActivity extends AppCompatActivity {
         one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("1");
+                display = display + "1";
+                screen.setText(display);
             }
         });
 
@@ -201,7 +209,8 @@ public class MainActivity extends AppCompatActivity {
         two.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("2");
+                display = display + "2";
+                screen.setText(display);
             }
         });
 
@@ -212,7 +221,8 @@ public class MainActivity extends AppCompatActivity {
         three.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("3");
+                display = display + "3";
+                screen.setText(display);
             }
         });
 
@@ -237,14 +247,28 @@ public class MainActivity extends AppCompatActivity {
         zero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screen.setText("0");
+                display = display + "0";
+                screen.setText(display);
             }
         });
 
         Button decimal_point = new Button(this);
         decimal_point.setText(".");
+//        decimal_point.setId(R.id.decimal_point);
         decimal_point.setBackgroundColor(0xFFD4D4D2);
         decimal_point.setLayoutParams(layoutParams);
+        decimal_point.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                display = display + ".";
+                //Log.i("decimal", v.getAccessibilityClassName().toString());
+                screen.setText(display);
+                System.out.println("Omarrrrrr");
+                System.out.println(v.getAccessibilityClassName().toString());
+                System.out.println(Integer.parseInt(nine.getText().toString())+3);
+            }
+        });
+
 
         Button equals = new Button(this);
         equals.setText("=");
